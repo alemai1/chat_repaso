@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tutor virtual FICDE – Sala de estudio</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --ficde-blue: #0b4f9c;
+      --ficde-blue-soft: #e7f1ff;
+      --ficde-orange: #ff9100;
+      --bg-soft: #f1f4ff;
+      --user-bubble: #ff9100;
+      --bot-bubble: #a7c8ff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Nunito", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: linear-gradient(135deg, #0b4f9c 0%, #f1f4ff 40%, #ffb347 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .app-wrapper {
+      background: #ffffff;
+      width: 95%;
+      max-width: 1024px;
+      border-radius: 24px;
+      box-shadow: 0 18px 45px rgba(0, 0, 0, 0.18);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: var(--ficde-blue);
+      color: #ffffff;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    header .title-block {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    header .title-block h1 {
+      font-size: 18px;
+      margin: 0;
+      font-weight: 700;
+    }
+
+    header .title-block span {
+      font-size: 13px;
+      opacity: 0.9;
+    }
+
+    main {
+      padding: 16px 18px 18px;
+      background: var(--bg-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+    }
+
+    /* Top bar: subir manual */
+    .top-bar {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 10px 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      box-shadow: 0 8px 16px rgba(11, 79, 156, 0.07);
+    }
+
+    .top-bar label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ficde-blue);
+    }
+
+    .top-bar input[type="file"] {
+      font-size: 12px;
+      max-width: 260px;
+    }
+
+    .top-bar button {
+      background: var(--ficde-orange);
+      color: #ffffff;
+      border: none;
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s ease;
+    }
+
+    .top-bar button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 12px rgba(255, 145, 0, 0.35);
+      background: #ffac33;
+    }
+
+    .top-bar span {
+      font-size: 12px;
+      color: #444;
+    }
+
+    /* Chat */
+    #chatWindow {
+      background: #ffffff;
+      border-radius: 22px;
+      padding: 14px 16px;
+      height: 420px;
+      overflow-y: auto;
+      box-shadow: inset 0 0 0 1px rgba(11, 79, 156, 0.05);
+      position: relative;
+    }
+
+    .message {
+      max-width: 80%;
+      padding: 10px 13px;
+      border-radius: 16px;
+      margin-bottom: 8px;
+      font-size: 14px;
+      line-height: 1.4;
+      white-space: pre-wrap;
+    }
+
+    .bot {
+      background: var(--bot-bubble);
+      color: #053469;
+      border-bottom-left-radius: 4px;
+    }
+
+    .user {
+      background: var(--user-bubble);
+      color: #ffffff;
+      border-bottom-right-radius: 4px;
+      margin-left: auto;
+    }
+
+    .input-row {
+      margin-top: 10px;
+      display: flex;
+      gap: 8px;
+      align-items: flex-end;
+    }
+
+    #chatInput {
+      flex: 1;
+      border-radius: 16px;
+      border: 1px solid rgba(11, 79, 156, 0.25);
+      padding: 10px 12px;
+      font-family: inherit;
+      font-size: 14px;
+      resize: vertical;
+      min-height: 48px;
+      max-height: 120px;
+      outline: none;
+      background: #ffffff;
+    }
+
+    #chatInput:focus {
+      border-color: var(--ficde-blue);
+      box-shadow: 0 0 0 2px rgba(11, 79, 156, 0.18);
+    }
+
+    #sendBtn {
+      background: var(--ficde-blue);
+      color: #ffffff;
+      border: none;
+      border-radius: 999px;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.15s ease;
+    }
+
+    #sendBtn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 14px rgba(11, 79, 156, 0.4);
+      background: #1463c1;
+    }
+
+    /* Robot-radio lofi */
+    #botAvatar {
+      position: absolute;
+      bottom: 22px;
+      right: 26px;
+      width: 70px;
+      height: 70px;
+      background: radial-gradient(circle at 30% 30%, #fff6e0, #ffb347);
+      border-radius: 50%;
+      box-shadow: 0 10px 22px rgba(0, 0, 0, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    #botAvatar .face {
+      width: 46px;
+      height: 46px;
+      border-radius: 18px;
+      background: #ffffff;
+      border: 3px solid #0b4f9c;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .eyes {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+
+    .eye {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #0b4f9c;
+      animation: blink 4s infinite;
+    }
+
+    .mouth {
+      width: 18px;
+      height: 4px;
+      border-radius: 999px;
+      background: #0b4f9c;
+    }
+
+    /* Notas musicales al reproducir */
+    #botAvatar.playing::before,
+    #botAvatar.playing::after {
+      content: "♪";
+      position: absolute;
+      font-size: 16px;
+      color: #ffffff;
+      text-shadow: 0 0 6px rgba(0, 0, 0, 0.4);
+      animation: floatNote 2.8s linear infinite;
+    }
+
+    #botAvatar.playing::before {
+      top: -4px;
+      right: 10px;
+      animation-delay: 0s;
+    }
+
+    #botAvatar.playing::after {
+      top: 4px;
+      right: -2px;
+      animation-delay: 1.2s;
+    }
+
+    @keyframes blink {
+      0%, 90%, 100% { transform: scaleY(1); }
+      92%, 96% { transform: scaleY(0.15); }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    @keyframes floatNote {
+      0% {
+        opacity: 0;
+        transform: translateY(0) translateX(0) scale(0.8);
+      }
+      20% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-30px) translateX(-8px) scale(1.2);
+      }
+    }
+
+    #botHint {
+      position: absolute;
+      bottom: 104px;
+      right: 105px;
+      max-width: 260px;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18);
+      padding: 10px 12px;
+      font-size: 12px;
+      color: #053469;
+      border-left: 4px solid var(--ficde-orange);
+      display: none;
+      z-index: 5;
+    }
+
+    #botHint strong {
+      color: var(--ficde-blue);
+    }
+
+    @media (max-width: 720px) {
+      .app-wrapper {
+        border-radius: 0;
+        max-width: 100%;
+        height: 100vh;
+      }
+
+      main {
+        padding-bottom: 90px;
+      }
+
+      #botAvatar {
+        bottom: 88px;
+      }
+
+      #botHint {
+        bottom: 168px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-wrapper">
+    <header>
+      <div class="title-block">
+        <span style="font-size:24px;">📚</span>
+        <div>
+          <h1>Tutor virtual FICDE – Sala de estudio</h1>
+          <span>Subís tu manual, y el tutor te guía con actividades interactivas 😊</span>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div class="top-bar">
+        <label for="manualInput">📁 Subir manual del módulo (PDF):</label>
+        <input type="file" id="manualInput" accept="application/pdf" />
+        <button id="uploadBtn">Cargar manual</button>
+        <span id="uploadStatus"></span>
+      </div>
+
+      <div id="chatWindow"></div>
+
+      <div class="input-row">
+        <textarea
+          id="chatInput"
+          placeholder="Escribí tu mensaje aquí... (Enter para enviar, Shift+Enter para salto de línea)"
+        ></textarea>
+        <button id="sendBtn">Enviar</button>
+      </div>
+
+      <div id="botHint">
+        <strong>Radio FICDE:</strong> hacé clic en el robot para encender o apagar la música relajante.<br><br>
+        El tutor usa tu manual para crear:<br>
+        • Flashcards con opción múltiple<br>
+        • Preguntas tipo examen<br>
+        • Verdadero / Falso<br><br>
+        Respondé con números (1–4), V/F o palabras cortitas como <em>salir</em>.
+      </div>
+
+      <!-- Robot-radio -->
+      <div id="botAvatar" title="Haz clic para encender/apagar la radio FICDE ✨">
+        <div class="face">
+          <div class="eyes">
+            <div class="eye"></div>
+            <div class="eye"></div>
+          </div>
+          <div class="mouth"></div>
+        </div>
+      </div>
+
+      <!-- Audio lofi (poné tu archivo en /static/lofi.mp3) -->
+      <audio id="lofiAudio" src="/static/lofi.mp3" loop></audio>
+    </main>
+  </div>
+
+  <script>
+    const chatWindow = document.getElementById("chatWindow");
+    const chatInput = document.getElementById("chatInput");
+    const sendBtn = document.getElementById("sendBtn");
+    const manualInput = document.getElementById("manualInput");
+    const uploadBtn = document.getElementById("uploadBtn");
+    const uploadStatus = document.getElementById("uploadStatus");
+    const botAvatar = document.getElementById("botAvatar");
+    const botHint = document.getElementById("botHint");
+    const lofiAudio = document.getElementById("lofiAudio");
+
+    let manualLoaded = false;
+    let hintVisible = false;
+    let audioPlaying = false;
+
+    function addMessage(text, sender = "bot") {
+      const el = document.createElement("div");
+      el.classList.add("message", sender);
+      el.textContent = text;
+      chatWindow.appendChild(el);
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    // Mensaje inicial
+    window.addEventListener("load", () => {
+      addMessage(
+        "Hola 👋 Soy tu tutor virtual.\n\n" +
+        "1️⃣ Primero, subí el PDF del módulo que querés repasar.\n" +
+        "   Voy a leerlo y armar actividades automáticas.\n\n" +
+        "Cuando termine, te voy a mostrar este menú:\n\n" +
+        "1) Flashcards (te muestro una DEFINICIÓN y elegís el TÉRMINO correcto).\n" +
+        "2) Preguntas de opción múltiple tipo examen (te muestro un TÉRMINO y elegís la DEFINICIÓN).\n" +
+        "3) Verdadero / Falso.\n" +
+        "4) Volver a cargar otro manual.\n\n" +
+        "Podés responder con números (1–4), con V/F o palabras cortitas como «salir».\n\n" +
+        "Si querés, tocá el robot naranja para encender la radio de música relajante 🎵."
+      );
+    });
+
+    // Subir manual
+    uploadBtn.addEventListener("click", async () => {
+      if (!manualInput.files || manualInput.files.length === 0) {
+        uploadStatus.textContent = "Elegí un PDF primero 🙂";
+        return;
+      }
+
+      const file = manualInput.files[0];
+      const fd = new FormData();
+      fd.append("manual", file);
+
+      uploadStatus.textContent = "Procesando manual, un momento por favor… ⏳";
+
+      try {
+        const res = await fetch("/upload_manual", {
+          method: "POST",
+          body: fd,
+        });
+        const data = await res.json();
+
+        if (data.ok) {
+          manualLoaded = true;
+        }
+        uploadStatus.textContent = "";
+        addMessage(data.message || "Listo. El tutor ya leyó tu manual.");
+      } catch (err) {
+        console.error(err);
+        uploadStatus.textContent = "";
+        addMessage("Ocurrió un error al subir el manual. Probá de nuevo o comentale al profe.");
+      }
+    });
+
+    // Enviar mensaje
+    async function sendMessage() {
+      const text = chatInput.value.trim();
+      if (!text) return;
+
+      addMessage(text, "user");
+      chatInput.value = "";
+
+      if (!manualLoaded) {
+        addMessage(
+          "Todavía no cargaste un manual 📚.\n" +
+          "Subí el PDF del módulo que querés repasar y después escribime de nuevo."
+        );
+        return;
+      }
+
+      try {
+        const res = await fetch("/api/message", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: text }),
+        });
+        const data = await res.json();
+        addMessage(data.reply || "Ocurrió un error. Probá de nuevo.");
+      } catch (err) {
+        console.error(err);
+        addMessage("Ocurrió un error de conexión. Intentá otra vez más tarde 🙏");
+      }
+    }
+
+    sendBtn.addEventListener("click", sendMessage);
+
+    chatInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    // Robot-radio: música + globito de ayuda
+    botAvatar.addEventListener("click", async () => {
+      // Alternar hint
+      hintVisible = !hintVisible;
+      botHint.style.display = hintVisible ? "block" : "none";
+
+      // Intentar alternar audio
+      try {
+        if (!audioPlaying) {
+          await lofiAudio.play();
+          audioPlaying = true;
+          botAvatar.classList.add("playing");
+        } else {
+          lofiAudio.pause();
+          audioPlaying = false;
+          botAvatar.classList.remove("playing");
+        }
+      } catch (e) {
+        console.warn("No se pudo reproducir el audio automáticamente:", e);
+      }
+    });
+  </script>
+</body>
+</html>
